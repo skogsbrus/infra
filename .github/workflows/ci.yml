@@ -1,0 +1,88 @@
+name: Terraform CI/CD
+
+on:
+  pull_request:
+  push: { branches: [main] }
+
+run-name: ${{ github.actor }} running Terraform CI/CD 🧑‍🔬
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This job was triggered by a ${{ github.event_name }} event."
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build . -t ci -f Dockerfile
+
+      - name: Run plan dev
+        env:
+          BACKBLAZE_TF_BACKEND_CONFIG: ${{ secrets.BACKBLAZE_TF_BACKEND_CONFIG_DEV }}
+          BACKBLAZE_ACCESS_KEY: ${{ secrets.BACKBLAZE_ACCESS_KEY }}
+          BACKBLAZE_SECRET_KEY: ${{ secrets.BACKBLAZE_SECRET_KEY }}
+        run: |
+          echo "$BACKBLAZE_TF_BACKEND_CONFIG" > /tmp/backend.hcl
+          docker run -t \
+          -v $PWD:/co \
+          -v /tmp/backend.hcl:/tmp/backend.hcl:ro \
+          -e B2_APPLICATION_KEY="$BACKBLAZE_SECRET_KEY" \
+          -e B2_APPLICATION_KEY_ID="$BACKBLAZE_ACCESS_KEY" \
+          ci plan /co/envs/dev /tmp/backend.hcl
+
+      - name: Run plan prod
+        env:
+          BACKBLAZE_TF_BACKEND_CONFIG: ${{ secrets.BACKBLAZE_TF_BACKEND_CONFIG_PROD }}
+          BACKBLAZE_ACCESS_KEY: ${{ secrets.BACKBLAZE_ACCESS_KEY }}
+          BACKBLAZE_SECRET_KEY: ${{ secrets.BACKBLAZE_SECRET_KEY }}
+        run: |
+          echo "$BACKBLAZE_TF_BACKEND_CONFIG" > /tmp/backend.hcl
+          docker run -t \
+          -v $PWD:/co \
+          -v /tmp/backend.hcl:/tmp/backend.hcl:ro \
+          -e B2_APPLICATION_KEY="$BACKBLAZE_SECRET_KEY" \
+          -e B2_APPLICATION_KEY_ID="$BACKBLAZE_ACCESS_KEY" \
+          ci plan /co/envs/prod /tmp/backend.hcl
+
+  apply:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: plan
+    steps:
+      - run: echo "This job was triggered by a ${{ github.event_name }} event."
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build . -t ci -f Dockerfile
+
+      - name: Run apply dev
+        env:
+          BACKBLAZE_TF_BACKEND_CONFIG: ${{ secrets.BACKBLAZE_TF_BACKEND_CONFIG_DEV }}
+          BACKBLAZE_ACCESS_KEY: ${{ secrets.BACKBLAZE_ACCESS_KEY }}
+          BACKBLAZE_SECRET_KEY: ${{ secrets.BACKBLAZE_SECRET_KEY }}
+        run: |
+          echo "$BACKBLAZE_TF_BACKEND_CONFIG" > /tmp/backend.hcl
+          docker run -t \
+          -v $PWD:/co \
+          -v /tmp/backend.hcl:/tmp/backend.hcl:ro \
+          -e B2_APPLICATION_KEY="$BACKBLAZE_SECRET_KEY" \
+          -e B2_APPLICATION_KEY_ID="$BACKBLAZE_ACCESS_KEY" \
+          ci apply /co/envs/dev /tmp/backend.hcl
+
+      - name: Run apply prod
+        env:
+          BACKBLAZE_TF_BACKEND_CONFIG: ${{ secrets.BACKBLAZE_TF_BACKEND_CONFIG_PROD }}
+          BACKBLAZE_ACCESS_KEY: ${{ secrets.BACKBLAZE_ACCESS_KEY }}
+          BACKBLAZE_SECRET_KEY: ${{ secrets.BACKBLAZE_SECRET_KEY }}
+        run: |
+          echo "$BACKBLAZE_TF_BACKEND_CONFIG" > /tmp/backend.hcl
+          docker run -t \
+          -v $PWD:/co \
+          -v /tmp/backend.hcl:/tmp/backend.hcl:ro \
+          -e B2_APPLICATION_KEY="$BACKBLAZE_SECRET_KEY" \
+          -e B2_APPLICATION_KEY_ID="$BACKBLAZE_ACCESS_KEY" \
+          ci apply /co/envs/prod /tmp/backend.hcl
