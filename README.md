@@ -1,4 +1,4 @@
-# skogsbrus/infra
+# ☁️☁️☁️ skogsbrus/infra ☁️☁️☁️
 
 This repository defines my private cloud infrastructure.
 
@@ -21,6 +21,17 @@ echo "use flake >> .envrc" && direnv allow
 See `flake.nix` for required dependencies.
 
 ## Development
+
+### CI/CD
+
+Changes to `.tf` files will trigger the CI/CD pipeline. Changes on `main` are
+auto-applied whereas only `terraform plan` will run on unmerged pull requests.
+Unlike Gitlab CI, there doesn't seem to be any nice mechanisms for manual job
+triggers unless you're on Github Pro. But hey, it works.
+
+The pipeline uses a combination of Nix and Docker, inspired by [this blog
+post](https://mitchellh.com/writing/nix-with-dockerfiles), where the built
+container uses Nix internally to guarantee reproducible builds.
 
 ### Making changes
 
