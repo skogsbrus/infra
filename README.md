@@ -1,4 +1,4 @@
-# ☁️☁️☁️ skogsbrus/infra ☁️☁️☁️
+# ☁️ skogsbrus/infra ☁️
 
 This repository defines my private cloud infrastructure.
 
