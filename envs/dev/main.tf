@@ -27,7 +27,7 @@ module "b2_backup" {
 
 module "b2_obsidian" {
   source      = "../../modules/b2-bucket"
-  bucket_name = "skogsbrus-obsidian-dev"
+  bucket_name = "skogsbrus-notes-dev"
   tags = {
     env = "dev"
   }

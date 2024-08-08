@@ -17,7 +17,7 @@ plan() {
 
 apply() {
     init
-    terraform apply
+    terraform apply -auto-approve
 }
 
 if [[ "$#" -ne 3 ]]; then
