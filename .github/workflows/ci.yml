@@ -4,10 +4,16 @@ on:
   pull_request:
     paths:
       - '**.tf'
+      - 'Dockerfile'
+      - 'flake.*'
+      - 'ci'
   push:
     branches: [main]
     paths:
       - '**.tf'
+      - 'Dockerfile'
+      - 'flake.*'
+      - 'ci'
 
 run-name: ${{ github.actor }} running Terraform CI/CD 🧑‍🔬
 
