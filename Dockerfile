@@ -1,4 +1,4 @@
-FROM nixos/nix:latest AS builder
+FROM nixos/nix:2.19.6 AS builder
 
 WORKDIR /tmp
 COPY flake.nix flake.lock ./
