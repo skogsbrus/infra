@@ -24,3 +24,11 @@ module "b2_backup" {
     env = "prod"
   }
 }
+
+module "b2_obsidian" {
+  source      = "../../modules/b2-bucket"
+  bucket_name = "skogsbrus-obsidian-prod"
+  tags = {
+    env = "prod"
+  }
+}
